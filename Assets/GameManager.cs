@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
 */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro; // You must add this line for TextMeshPro
@@ -67,7 +68,9 @@ public class GameManager : MonoBehaviour
     {
         // Append the new message to the existing log and show it on screen
         logText.text += "\n" + message;
-
+        // Start a coroutine to handle the scroll snap after the UI updates
+        StartCoroutine(SnapToBottom());
+        Canvas.ForceUpdateCanvases();
         // --- NEW CODE ADDED FOR SCROLLING ---
         // Make sure the scroll view automatically jumps to the bottom (newest message)
         if (logScrollRect != null)
@@ -82,6 +85,16 @@ public class GameManager : MonoBehaviour
 
         // Optional: Keep the log from getting too long
         if (logText.text.Length > 2000) logText.text = logText.text.Substring(logText.text.Length - 1000); 
+    }
+    IEnumerator SnapToBottom()
+    {
+        // Wait for the end of the frame so Content Size Fitter can update the height
+        yield return new WaitForEndOfFrame();
+
+        if (logScrollRect != null)
+        {
+            logScrollRect.verticalNormalizedPosition = 0f;
+        }
     }
     // Inside GameManager.cs
     private void InitializeBoard()
